@@ -1,0 +1,6 @@
+data
+client/node_modules
+client/build
+.vscode/
+server/bin
+server/build

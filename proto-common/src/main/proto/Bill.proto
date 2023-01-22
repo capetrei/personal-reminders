@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package personal.reminders.server.proto;
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "personal.reminders.server.proto";
+
+
+service Bill {
+  rpc SetBill (BillRequest) returns (BillResponse) {}
+  rpc ListBills(google.protobuf.Empty) returns (ListBillsResponse) {}
+}
+
+message BillProto {
+  int32 id = 1;
+  string service = 2;
+  string providerURL = 3;
+}
+
+message BillRequest {
+  string service = 1;
+  string providerURL = 2;
+}
+
+message BillResponse {
+  string message = 1;
+}
+
+message ListBillsResponse {
+  repeated BillProto bills = 1;
+}

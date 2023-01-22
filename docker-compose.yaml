@@ -1,0 +1,71 @@
+version: "3.9"
+services:
+  fe:
+    image: react-fe:0.0.1
+    ports:
+      - 9090:80
+    build:
+      context: .
+      dockerfile: client/compose.Dockerfile
+      args:
+        REACT_APP_GRPC_BACKEND: "http://localhost:9099" # envoy needs to be available from browser
+    depends_on:
+      - fe-base
+      - envoy
+
+  be:
+    image: spring-be:0.0.1
+    build:
+      context: .
+      dockerfile: server/compose.Dockerfile
+    environment:
+      - "POSTGRES_HOST=db"
+      - "POSTGRES_PORT=5432"
+      - "POSTGRES_DB=postgres"
+      - "POSTGRES_USER=postgres"
+      - "POSTGRES_PASSWORD=postgress"
+    depends_on:
+      - be-base
+      - db
+
+  envoy:
+    image: envoyproxy/envoy:v1.24-latest
+    ports:
+      - 9099:8080
+    volumes:
+      - ./config/envoy/envoy.yaml:/etc/envoy/envoy.yaml
+      - ./config/local_tls:/etc/local_tls
+    entrypoint: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
+    depends_on:
+      - be
+
+  db:
+    image: postgres:15.1
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgress
+      - POSTGRES_DB=postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  fe-base:
+    image: react-fe-base:0.0.1
+    build:
+      context: .
+      dockerfile: client/base.Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 0
+
+  be-base:
+    image: spring-be-base:0.0.1
+    build:
+      context: .
+      dockerfile: server/base.Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 0
+volumes:
+  pgdata:
+
+

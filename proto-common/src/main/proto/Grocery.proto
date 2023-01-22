@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package personal.reminders.server.proto;
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "personal.reminders.server.proto";
+
+
+service Grocery {
+  rpc SetGrocery (GroceryRequest) returns (GroceryResponse) {}
+  rpc ListGroceries(google.protobuf.Empty) returns (ListGroceriesResponse) {}
+}
+
+message GroceryProto {
+  int32 id = 1;
+  string item = 2;
+  string shopURL = 3;
+}
+
+message GroceryRequest {
+  string item = 1;
+  string shopURL = 2;
+}
+
+message GroceryResponse {
+  string message = 1;
+}
+
+message ListGroceriesResponse {
+  repeated GroceryProto groceries = 1;
+}
+
